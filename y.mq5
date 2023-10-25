@@ -56,8 +56,8 @@ datetime red_trade_started_at ;
 datetime green_trade_started_at ;
 datetime now, endTime,today;
 long allowedLogin = 31034436;
-datetime startDate = D'2023.10.23';
-int trial_days = 7;
+datetime startDate = D'2023.10.24';
+int trial_days = 2;
 
 datetime tm = TimeCurrent();
 MqlDateTime stm;
@@ -75,6 +75,32 @@ bool isDate7DaysFromGivenDay(const datetime givenDay)
 //+------------------------------------------------------------------+
 int OnInit()
   {
+  
+  ENUM_BASE_CORNER BASE_CORNER = CORNER_RIGHT_LOWER;
+int FontSize = 20;
+string FontName = "Times New Roman";
+string NoteRedGreenBlue = "Red/Green/Blue each 0..255";
+int RGBRed = 1;
+int RGBGreen = 1;
+int RGBBlue = 1;
+int XPos = 250;
+
+string Pair = "Symbol";
+int RGB = 0;
+string tf;
+int YPos = 200;
+  
+          watermark(Pair, "Harry Vfx King , " + Period() + " , " + Symbol(), FontSize, FontName, RGB, XPos, YPos);
+
+
+      ChartSetInteger(0, CHART_COLOR_BACKGROUND, clrBlack);
+    ChartSetInteger(0, CHART_COLOR_CANDLE_BULL, clrGreen);
+    ChartSetInteger(0, CHART_COLOR_CHART_UP, clrGreen);
+    ChartSetInteger(0, CHART_COLOR_CANDLE_BEAR, clrRed);
+    ChartSetInteger(0, CHART_COLOR_CHART_DOWN, clrRed);
+    ChartSetInteger(0, CHART_SHOW_GRID, false);
+    ChartSetInteger(0, CHART_COLOR_FOREGROUND, clrWhite);
+    
 //---
    start_trading = false;
        now = TimeTradeServer();
@@ -111,6 +137,19 @@ int OnInit()
 void OnDeinit(const int reason)
   {
 //---
+
+
+ // Add any deinitialization code here
+    ChartSetInteger(0, CHART_COLOR_BACKGROUND, clrBlack);
+    ChartSetInteger(0, CHART_COLOR_CANDLE_BULL, clrBlack);
+    ChartSetInteger(0, CHART_COLOR_CHART_UP, clrGreen);
+    ChartSetInteger(0, CHART_COLOR_CANDLE_BEAR, clrWhite);
+    ChartSetInteger(0, CHART_COLOR_CHART_DOWN, clrGreen);
+    ChartSetInteger(0, CHART_SHOW_GRID, true);
+    ChartSetInteger(0, CHART_COLOR_FOREGROUND, clrWhite);
+
+      
+      ObjectsDeleteAll(0,0);
    
   }
 //+------------------------------------------------------------------+
@@ -118,6 +157,8 @@ void OnDeinit(const int reason)
 //+------------------------------------------------------------------+
 void OnTick()
   {
+  
+  
 //---
    int end_hour = (selected_time.hour + (run_bot_for_x_minutes / 60));
     // Calculate the end minutes (using modulus)
@@ -304,7 +345,89 @@ void OnTick()
              
              }
 
+ // Create and set properties for each label object
+        int yDistance = 20; // Vertical distance between labels
 
-   
+        // Create and set properties for label "_LABEL_4"
+        ObjectCreate(0, "_LABEL_4", OBJ_LABEL, 0, 0, 0);
+        ObjectSetInteger(0, "_LABEL_4", OBJPROP_CORNER, CORNER_LEFT_LOWER);
+        ObjectSetInteger(0, "_LABEL_4", OBJPROP_ANCHOR, CORNER_LEFT_LOWER);
+        ObjectSetInteger(0, "_LABEL_4", OBJPROP_COLOR, clrWhite);
+        ObjectSetString(0, "_LABEL_4", OBJPROP_TEXT, "Current time is " + current_t);
+        ObjectSetInteger(0, "_LABEL_4", OBJPROP_YDISTANCE, yDistance * 3);
+        ObjectSetInteger(0, "_LABEL_4", OBJPROP_XDISTANCE, 10);
+
+        // Create and set properties for label "_LABEL_2"
+        ObjectCreate(0, "_LABEL_2", OBJ_LABEL, 0, 0, 0);
+        ObjectSetInteger(0, "_LABEL_2", OBJPROP_CORNER, CORNER_LEFT_LOWER);
+        ObjectSetInteger(0, "_LABEL_2", OBJPROP_ANCHOR, CORNER_LEFT_LOWER);
+        ObjectSetInteger(0, "_LABEL_2", OBJPROP_COLOR, clrWhite);
+        string text = "Bot starts at " + now;
+        ObjectSetString(0, "_LABEL_2", OBJPROP_TEXT, text);
+        ObjectSetInteger(0, "_LABEL_2", OBJPROP_YDISTANCE, yDistance * 2);
+        ObjectSetInteger(0, "_LABEL_2", OBJPROP_XDISTANCE, 10);
+
+        ObjectCreate(0, "_LABEL_50", OBJ_LABEL, 0, 0, 0);
+        ObjectSetInteger(0, "_LABEL_50", OBJPROP_CORNER, CORNER_LEFT_LOWER);
+        ObjectSetInteger(0, "_LABEL_50", OBJPROP_ANCHOR, CORNER_LEFT_LOWER);
+        ObjectSetInteger(0, "_LABEL_50", OBJPROP_COLOR, clrWhite);
+        ObjectSetString(0, "_LABEL_50", OBJPROP_TEXT, "Bot will end at " + endTime);
+
+        ObjectSetInteger(0, "_LABEL_50", OBJPROP_YDISTANCE, yDistance);
+        ObjectSetInteger(0, "_LABEL_50", OBJPROP_XDISTANCE, 10);
+
+        // Create and set properties for label "_LABEL_3"
+
+        ObjectCreate(0, "_LABEL_3", OBJ_LABEL, 0, 0, 0);
+        ObjectSetInteger(0, "_LABEL_3", OBJPROP_CORNER, CORNER_RIGHT_UPPER);
+        ObjectSetInteger(0, "_LABEL_3", OBJPROP_ANCHOR, ANCHOR_RIGHT_UPPER);
+        ObjectSetInteger(0, "_LABEL_3", OBJPROP_COLOR, clrYellowGreen);
+        ObjectSetString(0, "_LABEL_3", OBJPROP_TEXT, current_ask);
+        ObjectSetInteger(0, "_LABEL_3", OBJPROP_YDISTANCE, yDistance * 2);
+        ObjectSetInteger(0, "_LABEL_3", OBJPROP_XDISTANCE, 10);
+
+        // Create and set properties for label "_LABEL_6"
+        ObjectCreate(0, "_LABEL_6", OBJ_LABEL, 0, 0, 0);
+        ObjectSetInteger(0, "_LABEL_6", OBJPROP_CORNER, CORNER_LEFT_UPPER);
+        ObjectSetInteger(0, "_LABEL_6", OBJPROP_ANCHOR, ANCHOR_LEFT_UPPER);
+        ObjectSetInteger(0, "_LABEL_6", OBJPROP_COLOR, clrWhite);
+        ObjectSetString(0, "_LABEL_6", OBJPROP_TEXT, "Initial Balance " + DoubleToString(initial_deposit, 2) + " USD");
+        ObjectSetInteger(0, "_LABEL_6", OBJPROP_YDISTANCE, yDistance);
+        ObjectSetInteger(0, "_LABEL_6", OBJPROP_XDISTANCE, 10);
+
+        // Create and set properties for label "_LABEL_7"
+        ObjectCreate(0, "_LABEL_7", OBJ_LABEL, 0, 0, 0);
+        ObjectSetInteger(0, "_LABEL_7", OBJPROP_CORNER, CORNER_LEFT_UPPER);
+        ObjectSetInteger(0, "_LABEL_7", OBJPROP_ANCHOR, ANCHOR_LEFT_UPPER);
+        ObjectSetInteger(0, "_LABEL_7", OBJPROP_COLOR, clrWhite);
+        ObjectSetString(0, "_LABEL_7", OBJPROP_TEXT, "Bot will stop at balance " + DoubleToString(max_equity_to_stop, 2) + " USD or " + DoubleToString(min_equity_to_stop, 2) + " USD");
+        ObjectSetInteger(0, "_LABEL_7", OBJPROP_YDISTANCE, yDistance * 2);
+        ObjectSetInteger(0, "_LABEL_7", OBJPROP_XDISTANCE, 10);
+
+        // Create and set properties for label "_LABEL_8"
+        ObjectCreate(0, "_LABEL_8", OBJ_LABEL, 0, 0, 0);
+        ObjectSetInteger(0, "_LABEL_8", OBJPROP_CORNER, CORNER_LEFT_UPPER);
+        ObjectSetInteger(0, "_LABEL_8", OBJPROP_ANCHOR, ANCHOR_LEFT_UPPER);
+        ObjectSetInteger(0, "_LABEL_8", OBJPROP_COLOR, clrWhite);
+        ObjectSetString(0, "_LABEL_8", OBJPROP_TEXT, "Current Equity is " + DoubleToString(AccountInfoDouble(ACCOUNT_EQUITY), 2));
+        ObjectSetInteger(0, "_LABEL_8", OBJPROP_YDISTANCE, yDistance * 3);
+        ObjectSetInteger(0, "_LABEL_8", OBJPROP_XDISTANCE, 10);
+
+
+     
   }
 //+------------------------------------------------------------------+
+
+void watermark(string obj, string text, int fontSize, string fontName, color colour, int xPos, int yPos)
+{
+    // Create and set properties for label "_LABEL_0"
+    ObjectCreate(0, "_LABEL_0", OBJ_LABEL, 0, 0, 0);
+    ObjectSetInteger(0, "_LABEL_0", OBJPROP_CORNER, CORNER_LEFT_UPPER);
+    ObjectSetInteger(0, "_LABEL_0", OBJPROP_ANCHOR, ANCHOR_LEFT_UPPER);
+    ObjectSetInteger(0, "_LABEL_0", OBJPROP_COLOR, clrGreenYellow);
+    ObjectSetString(0, "_LABEL_0", OBJPROP_TEXT, text);
+    ObjectSetString(0, "_LABEL_0", OBJPROP_FONT, fontName);
+    ObjectSetInteger(0, "_LABEL_0", OBJPROP_FONTSIZE, fontSize);
+    ObjectSetInteger(0, "_LABEL_0", OBJPROP_YDISTANCE, yPos);
+    ObjectSetInteger(0, "_LABEL_0", OBJPROP_XDISTANCE, xPos);
+}
