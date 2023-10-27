@@ -9,40 +9,40 @@
 
 #include <Trade\Trade.mqh>
 CTrade trade;
-
+bool start_trading;
 
 input group "EA SETTINGS" 
-input double lot_size = 2;
-input double stop_bot_at_max_profit = 200;
-input double stop_bot_at_max_loss = 200;
-input double spike_length_pips = 2;
-input int run_bot_for_x_minutes = 13200;
-input int number_of_trade_ = 1;
+input double lot_size = 0;
+input double stop_bot_at_max_profit = 0;
+input double stop_bot_at_max_loss = 0;
+input double spike_length_pips = 0;
+input int run_bot_for_x_minutes = 0;
+input int number_of_trade_ = 0;
 
 input group "TYPES OF EXECUTION" 
-input bool BUY_EXECUTION = true;
+input bool BUY_EXECUTION = false;
 input bool SELL_EXECUTION = false;
 
 
 input group "ORDER POSITION INSTRUCTIONS" 
-input bool EXECUTION_AT_RED_CANDLE_CLOSE = true;
+input bool EXECUTION_AT_RED_CANDLE_CLOSE = false;
 input double execution_pips_from_red_close = 0;
 
-input bool EXECUTION_AT_GREEN_CANDLE_CLOSE = true;
+input bool EXECUTION_AT_GREEN_CANDLE_CLOSE = false;
 input double execution_pips_from_green_close = 0;
 
 input group "TP INSTRUCTIONS" 
-input bool TP_IN_PIPS = true;
-input double red_take_profit_pips = 20;
-input double green_take_profit_pips = 25;
+input bool TP_IN_PIPS = false;
+input double red_take_profit_pips = 0;
+input double green_take_profit_pips = 0;
 
 input bool TP_IN_SECONDS = false;
 input double red_take_profit_seconds = 0;
 input double green_take_profit_seconds = 0;
 
 input group "SL INSTRUCTIONS" 
-input double red_stop_loss_pips = 25;
-input double green_stop_loss_pips = 20;
+input double red_stop_loss_pips = 0;
+input double green_stop_loss_pips = 0;
 
 double initial_deposit = AccountInfoDouble(ACCOUNT_BALANCE);
 double max_equity_to_stop = initial_deposit + stop_bot_at_max_profit;
@@ -51,24 +51,16 @@ double min_equity_to_stop = initial_deposit - stop_bot_at_max_loss;
 
 int totalBars;
 bool orderTriggered = false;
-bool start_trading;
+
 datetime red_trade_started_at ;
 datetime green_trade_started_at ;
 datetime now, endTime,today;
-long allowedLogin = 31034436;
-datetime startDate = D'2023.10.24';
 int trial_days = 2;
 
 datetime tm = TimeCurrent();
 MqlDateTime stm;
 MqlDateTime selected_time;
 
-bool isDate7DaysFromGivenDay(const datetime givenDay)
-{
-    today = TimeLocal();
-    datetime endDate = startDate + (trial_days * 24 * 60 * 60);
-    return endDate < startDate;
-}
 
 //+------------------------------------------------------------------+
 //| Expert initialization function                                   |
@@ -107,26 +99,8 @@ int YPos = 200;
     today = TimeTradeServer();
     endTime = today + (1 * 1 * run_bot_for_x_minutes * 60);
     
-    
-        if (isDate7DaysFromGivenDay(startDate))
-    {
-        // Display an alert message
-        Alert("Your trial has expired. Contact wamaitha@peeppips.com");
+ 
 
-        // Remove the Expert Advisor
-        ExpertRemove();
-        return (INIT_FAILED);
-    }
-    
-      if (AccountInfoInteger(ACCOUNT_LOGIN) != allowedLogin)
-    {
-        // Display an alert message
-        Alert("Unauthorized access. This EA will be removed.");
-
-        // Remove the Expert Advisor
-        ExpertRemove();
-        return (INIT_FAILED);
-    }
     
 //---
    return(INIT_SUCCEEDED);
@@ -207,13 +181,7 @@ void OnTick()
         ExpertRemove();
     }
 
-    if (isDate7DaysFromGivenDay(startDate))
-    {
-        // Display an alert message
-        Alert("Your trial period has expired. This EA will be removed.");
-        ExpertRemove();
-    }
-    
+
     int bars = iBars(_Symbol, PERIOD_CURRENT);
     
     double current_ask = SymbolInfoDouble(_Symbol, SYMBOL_ASK);
@@ -226,6 +194,7 @@ void OnTick()
     
             if (bars > totalBars)
         {
+        start_trading = true;
         
                 for (int i = PositionsTotal() - 1; i >= 0; i--)
         {
@@ -241,7 +210,7 @@ void OnTick()
                  double open_previous = iOpen(Symbol(), PERIOD_CURRENT, 1);
                  
                  //BEAR
-                             if ((open_previous - close_previous >= spike_length_pips) && BUY_EXECUTION && EXECUTION_AT_RED_CANDLE_CLOSE)
+                             if ((open_previous - close_previous >= spike_length_pips) && BUY_EXECUTION && EXECUTION_AT_RED_CANDLE_CLOSE && start_trading)
             {
             
             
@@ -291,7 +260,7 @@ void OnTick()
             }
             
             //BULL
-                              if ((close_previous - open_previous >= spike_length_pips) && BUY_EXECUTION && EXECUTION_AT_GREEN_CANDLE_CLOSE)
+                              if ((close_previous - open_previous >= spike_length_pips) && BUY_EXECUTION && EXECUTION_AT_GREEN_CANDLE_CLOSE && start_trading)
             {
                 
                 
